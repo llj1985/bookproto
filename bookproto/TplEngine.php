@@ -33,7 +33,7 @@ class TplEngine
             !file_exists($compiledFilename)) {
 
             $str = self::compile(file_get_contents($filename));
-            file_put_contents($compiledFilename, $str);
+            Util::saveToFile($compiledFilename, $str);
 
             $cache = new TplCache();
             $cache->filename = $filename;
