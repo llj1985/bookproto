@@ -1,0 +1,7 @@
+package bookrpg.common;
+
+message Bar
+{
+	required sint32 sint32_field = 1;
+	repeated double double_field = 2;
+}
