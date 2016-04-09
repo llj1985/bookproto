@@ -65,25 +65,26 @@ function getMapedType($field)
     return isset($typeMap[$type]) ? $typeMap[$type] : $type;
 }
 
-function getFieldType($field)
+function getFieldType($field, $prefix='')
 {
-    $type = getMapedType($field);
-    $package = $field->getNamespace();
-    if ($package != '') {
-        $type = $package . '.' . $type;
-    }
+    $type = getFieldNotListType($field, $prefix);
+
     if ($field->isRepeated()) {
         $type = "List<" . $type . ">";
     }
     return $type;
 }
 
-function getFieldNotListType($field)
+function getFieldNotListType($field, $prefix='')
 {
     $type = getMapedType($field);
-    $package = $field->getNamespace();
-    if ($package != '') {
-        $type = $package . '.' . $type;
+
+    if (!$field->isProtobufScalarType()) {
+        $type = $prefix . $type;
+        $package = $field->getNamespace();
+        if ($package != '') {
+            $type = $package . '.' . $type;
+        }
     }
 
     return $type;

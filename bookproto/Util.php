@@ -10,7 +10,7 @@ class Util
     public static function autoload($dir)
     {
         foreach (glob($dir . '/*.php') as $file) {
-            @include_once $file;
+            include_once $file;
         }
     }
 
@@ -120,10 +120,8 @@ class Util
         if ($path == '') {
             return $path;
         }
-        if (!preg_match('/\/$/', $path)) {
-            $path .= '/';
-        }
-        return $path;
+        
+        return rtrim($path,"/\\") . "/";
     }
 
     public static function getAbsolutePath($path, $relativePath = null)

@@ -21,7 +21,10 @@ const EOL = "\n";
 
 $file = '';
 
-$codeGenerator = array('C#' => APP_ROOT . 'template/C#');
+$codeGenerator = array(
+    'C#' => APP_ROOT . 'template/C#', 
+    'PHP' => APP_ROOT . 'template/PHP',
+);
 
 $theParams = null;
 
@@ -84,7 +87,7 @@ function parseProtos($params)
         }
         $tplDir = Util::getAbsolutePath($tplDir);
         $params['templateDir'] = $tplDir;
-        Util::autoload($tplDir);
+        @include $tplDir . '/util.php';
     }
 
     global $theParams;
@@ -245,6 +248,7 @@ function insertNestedEnum($enum)
         return;
     }
 
+    $package = $file->getPackage();
     $prefix = $params['prefix'];
     include TplEngine::compileFile($tpl);
 }

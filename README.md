@@ -6,6 +6,7 @@ Generate protobuf parse code with custom template.
 
 * Works on Windows,Linux and Mac OX S
 * Support `template` for any language
+* Default implements `C#, PHP`
 * Batch works
 * Filter by: `file name`
 

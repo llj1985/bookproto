@@ -5,10 +5,8 @@
 			$fname = $field->getName();
 			$ufname = ucfirst($fname);
 			$number = $field->getNumber();
-			$type = getFieldType($field);
-            if ($field->isOptional()) {
-                $default = $field->getDefault();
-            }
+			$type = getFieldType($field, $prefix);
+            $default = $field->getDefault();
 		%}
 		private {%$type%} _{%$fname%}{%echo isset($default)?'='.$default:''%};
 		public  {%$type%} {%$fname%} 
@@ -58,8 +56,8 @@
 						$tag = $field->getNumber();
 						$fname = $field->getName();
 						$reader = getFieldReader($field);
-						$typeName = getFieldType($field);
-						$typeName2 = getFieldNotListType($field);
+						$typeName = getFieldType($field, $prefix);
+						$typeName2 = getFieldNotListType($field, $prefix);
 
 						if (isMessage($field)) {
                             $str1 = "ReadUtils.{$reader}(stream, new {$typeName2}()) as {$typeName2}";
@@ -92,6 +90,7 @@
             {%
                 foreach ($fields as $field):
                 $fname = $field->getName();
+                $default = $field->getDefault();
                 if ($field->isRequired()):
             %}
             if ({%$fname%}Count == 0) {
@@ -113,8 +112,8 @@
 				$default = $field->getDefault();
 				$writer = getFieldWriter($field);
                 $wireType = getWireType($field);
-				$typeName = getFieldType($field);
-				$typeName2 = getFieldNotListType($field);
+				$typeName = getFieldType($field, $prefix);
+				$typeName2 = getFieldNotListType($field, $prefix);
 
 				$var = $field->isRepeated() ? "item" : "this.{$fname}";
 
@@ -126,7 +125,7 @@
 				}
 			%}
 			{%if ($field->isRequired()):%}
-			if (this.has{%$ufname%}) {
+			if (this.has{%$ufname%} {%if(isset($default)):%}|| this.{%$fname%}=={%$default%}{%endif;%}) {
                 WriteUtils.writeTag(stream, WireType.{%$wireType%}, {%$number%});
                 {%$str1%} 
 			} else {

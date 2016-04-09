@@ -19,7 +19,7 @@ $params = array(
 
 $params['inputPath'] = 'test/*.proto';
 $params['outputPath'] = 'protos';
-$params['codeType'] = 'C#';
+$params['codeType'] = 'PHP';
 parseProtos($params);
 
 
