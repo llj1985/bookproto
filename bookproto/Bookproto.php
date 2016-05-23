@@ -306,10 +306,9 @@ function isIgnoreFile($filename)
 
 function getTpl($tplName)
 {
-    $params = $GLOBALS['theParams'];
-    $tplDir = $params['templateDir'];
+    $tplDir = $GLOBALS['theParams']['templateDir'];
     $arr = glob(Util::addDirSeparator($tplDir) . $tplName . '.*');
-    if ($arr === false || count($arr) == 0) {
+    if (empty($arr)) {
         Util::error("can not find template: $tplName in $tplDir");
         return '';
     }

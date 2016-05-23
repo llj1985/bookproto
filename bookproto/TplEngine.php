@@ -46,6 +46,8 @@ class TplEngine
 
     public static function compile($str)
     {
+        $str = str_replace('{%:', '{%echo ', $str);
+
         $str = preg_replace(
             '/(\{%\s*)([A-Z_]+|\$\w+|\$\w+\[.+\])(\s*%\})/',
             '\1echo \2;\3',

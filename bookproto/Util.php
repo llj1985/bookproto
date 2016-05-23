@@ -37,12 +37,32 @@ class Util
     }
 
     /**
+     * return directory
+     * xxx/name.txt => xxx
+     * xxx/yyy/ => xxx/yyy
+     */
+    public static function getDir($filename)
+    {
+        if (is_dir($filename)) {
+            return rtrim($filename, "/\\");
+        } else if (is_file($filename)) {
+            return dirname($filename);
+        }
+
+        $filename = preg_replace("/\w*[*?.]\w*$/", '', $filename);
+        return rtrim($filename, "/\\");
+    }
+
+    /**
      * return path without extentsion
      * xxx/name.txt => xxx/name
      * xxx/yyy/ => xxx/yyy
      */
     public static function getBasePath($filename)
     {
+        if (is_dir($filename)) {
+            return rtrim($filename, "/\\");
+        }
         return preg_replace("/\.([^\\\.\/]+)$/", '', $filename);
     }
 
