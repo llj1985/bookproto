@@ -3,12 +3,12 @@
 		{%
 			foreach ($fields as $field):
 			$fname = $field->getName();
-			$ufname = ucfirst($fname);
+			$ufname = Ucfirst($fname);
 			$number = $field->getNumber();
-			$type = getFieldType($field, $prefix);
+			$type = GetFieldType($field, $prefix);
             $default = $field->getDefault();
 		%}
-		private {%$type%} _{%$fname%}{%echo isset($default)?'='.$default:''%};
+		private {%$type%} _{%$fname%}{%echo Isset($default)?'='.$default:''%};
 		public  {%$type%} {%$fname%} 
 		{
 			get{return _{%$fname%};}
@@ -18,20 +18,20 @@
         private bool _has{%$ufname%} = false;
         {%if($field->isRepeated()):%}
         public  bool has{%$ufname%} {get{return _has{%$ufname%} && _{%$fname%}!=null && _{%$fname%}.Count>0;}}
-        {%elseif (isMessage($field)):%}
+        {%elseif (IsMessage($field)):%}
         public  bool has{%$ufname%} {get{return _has{%$ufname%} && _{%$fname%}!=null;}}
         {%else:%}
         public  bool has{%$ufname%} {get{return _has{%$ufname%};}}
         {%endif;%}
-        {%if($field->isRepeated() || isMessage($field)):%}
+        {%if($field->isRepeated() || IsMessage($field)):%}
         public  void clear{%$ufname%}() {{%$fname%}=null; _has{%$ufname%}=false;}
         {%else:%}
-		public  void clear{%$ufname%}() {{%echo isset($default)?$fname.'='.$default.'; ':''%}_has{%$ufname%}=false;}
+		public  void clear{%$ufname%}() {{%echo Isset($default)?$fname.'='.$default.'; ':''%}_has{%$ufname%}=false;}
         {%endif;%}
 
 		{%endforeach;%}
 
-		public void parseFrom(Stream stream)
+		public void ParseFrom(Stream stream)
 		{
             {%
                 foreach ($fields as $field):
@@ -46,7 +46,7 @@
 
             while (stream.Position != stream.Length)
             {
-                var tag = ReadUtils.readTag(stream);
+                var tag = ReadUtils.ReadTag(stream);
                 switch (tag.number)
                 {
                 	case 0:
@@ -55,13 +55,13 @@
 						foreach ($fields as $field):
 						$tag = $field->getNumber();
 						$fname = $field->getName();
-						$reader = getFieldReader($field);
-						$typeName = getFieldType($field, $prefix);
-						$typeName2 = getFieldNotListType($field, $prefix);
+						$reader = GetFieldReader($field);
+						$typeName = GetFieldType($field, $prefix);
+						$typeName2 = GetFieldNotListType($field, $prefix);
 
-						if (isMessage($field)) {
+						if (IsMessage($field)) {
                             $str1 = "ReadUtils.{$reader}(stream, new {$typeName2}()) as {$typeName2}";
-						} else if(isEnum($field)){
+						} else if(IsEnum($field)){
                             $str1 = "({$typeName2})ReadUtils.{$reader}(stream)";
 						} else {
 							$str1 = "ReadUtils.{$reader}(stream)";
@@ -82,7 +82,7 @@
                         break;
 					{%endforeach;%}
 					default:
-                        ReadUtils.skip(stream, tag.wireType);
+                        ReadUtils.Skip(stream, tag.wireType);
                         break;
                 }
             }
@@ -102,22 +102,22 @@
             %}
 		}
 
-		public void writeTo(Stream stream)
+		public void WriteTo(Stream stream)
 		{
             {%
 				foreach ($fields as $field):
 				$number = $field->getNumber();
 				$fname = $field->getName();
-				$ufname = ucfirst($fname);
+				$ufname = Ucfirst($fname);
 				$default = $field->getDefault();
-				$writer = getFieldWriter($field);
-                $wireType = getWireType($field);
-				$typeName = getFieldType($field, $prefix);
-				$typeName2 = getFieldNotListType($field, $prefix);
+				$writer = GetFieldWriter($field);
+                $wireType = GetWireType($field);
+				$typeName = GetFieldType($field, $prefix);
+				$typeName2 = GetFieldNotListType($field, $prefix);
 
 				$var = $field->isRepeated() ? "item" : "this.{$fname}";
 
-				if(isEnum($field)) {
+				if(IsEnum($field)) {
 					$str1 = "WriteUtils.{$writer}(stream, (int){$var});";
 				}
 				else{
@@ -125,8 +125,8 @@
 				}
 			%}
 			{%if ($field->isRequired()):%}
-			if (this.has{%$ufname%} {%if(isset($default)):%}|| this.{%$fname%}=={%$default%}{%endif;%}) {
-                WriteUtils.writeTag(stream, WireType.{%$wireType%}, {%$number%});
+			if (this.has{%$ufname%} {%if(Isset($default)):%}|| this.{%$fname%}=={%$default%}{%endif;%}) {
+                WriteUtils.WriteTag(stream, WireType.{%$wireType%}, {%$number%});
                 {%$str1%} 
 			} else {
                 throw new ProtobufException("Required field {%$fname%} not set");
@@ -135,19 +135,19 @@
 			if (this.has{%$ufname%}) {
 				foreach (var item in this.{%$fname%})
                 {
-                    WriteUtils.writeTag(stream, WireType.{%$wireType%}, {%$number%});
+                    WriteUtils.WriteTag(stream, WireType.{%$wireType%}, {%$number%});
                     {%$str1%} 
                 }
 			}
 			{%else:%}
-            {%if(isset($default)):%}
+            {%if(Isset($default)):%}
             if (this.has{%$ufname%} && this.{%$fname%} != {%$default%}) {
-                WriteUtils.writeTag(stream, WireType.{%$wireType%}, {%$number%});
+                WriteUtils.WriteTag(stream, WireType.{%$wireType%}, {%$number%});
                 {%$str1%} 
             }
             {%else:%}
             if (this.has{%$ufname%}) {
-                WriteUtils.writeTag(stream, WireType.{%$wireType%}, {%$number%});
+                WriteUtils.WriteTag(stream, WireType.{%$wireType%}, {%$number%});
                 {%$str1%} 
             }
             {%endif;%}

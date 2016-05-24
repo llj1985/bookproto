@@ -5,8 +5,8 @@ namespace bookrpg.net.protobuf
 {
 	public interface IMessage
 	{
-	    void parseFrom(Stream input);
+	    void ParseFrom(Stream input);
 
-	    void writeTo(Stream output);
+	    void WriteTo(Stream output);
 	}
 }

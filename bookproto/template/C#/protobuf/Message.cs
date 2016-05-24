@@ -12,22 +12,22 @@ namespace bookrpg.net.protobuf
         {
         }
 
-        public virtual void parseFrom(Stream input)
+        public virtual void ParseFrom(Stream input)
         {
             throw new InvalidOperationException("Not implemented.");
         }
 
-        public virtual void writeTo(Stream output)
+        public virtual void WriteTo(Stream output)
         {
             throw new InvalidOperationException("Not implemented.");
         }
 
         public override string ToString()
         {
-            return messageToString(this);
+            return MessageToString(this);
         }
 
-        private static string messageToString(IMessage msg)
+        private static string MessageToString(IMessage msg)
         {
         	return "";
         }

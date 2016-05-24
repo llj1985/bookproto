@@ -13,7 +13,7 @@ namespace bookrpg.net.protobuf
 
         private static BinaryReader reader;
 
-        private static BinaryReader getReader(Stream stream)
+        private static BinaryReader GetReader(Stream stream)
         {
             if (reader == null || reader.BaseStream != stream) {
                 reader = new BinaryReader(stream);
@@ -21,7 +21,7 @@ namespace bookrpg.net.protobuf
             return reader;
         }
 
-        public static void skip(Stream stream, WireType wireType)
+        public static void Skip(Stream stream, WireType wireType)
         {
             switch (wireType) {
                 case WireType.Varint:
@@ -34,7 +34,7 @@ namespace bookrpg.net.protobuf
                     stream.Seek(8, SeekOrigin.Current);
                     break;
                 case WireType.LengthDelimited:
-                    stream.Seek((int)readVarint(stream), SeekOrigin.Current);
+                    stream.Seek((int)ReadVarint(stream), SeekOrigin.Current);
                     break;
                 default:
                     throw new NotImplementedException("Unknown wire type: " + wireType);
@@ -43,46 +43,46 @@ namespace bookrpg.net.protobuf
 
         #region varint number
 
-        public static Tag readTag(Stream stream)
+        public static Tag ReadTag(Stream stream)
         {
             var tag = new Tag();
-            var n = (uint)readVarint(stream);
+            var n = (uint)ReadVarint(stream);
             tag.wireType = (WireType)(n & 7);
             tag.number = n >> 3;
             return tag;
         }
 
-        public static int read_TYPE_INT32(Stream stream)
+        public static int Read_TYPE_INT32(Stream stream)
         {
-            return (int)readVarint(stream);
+            return (int)ReadVarint(stream);
         }
 
-        public static long read_TYPE_INT64(Stream stream)
+        public static long Read_TYPE_INT64(Stream stream)
         {
-            return (long)readVarint(stream);
+            return (long)ReadVarint(stream);
         }
 
-        public static uint read_TYPE_UINT32(Stream stream)
+        public static uint Read_TYPE_UINT32(Stream stream)
         {
-            return (uint)readVarint(stream);
+            return (uint)ReadVarint(stream);
         }
 
-        public static ulong read_TYPE_UINT64(Stream stream)
+        public static ulong Read_TYPE_UINT64(Stream stream)
         {
-            return readVarint(stream);
+            return ReadVarint(stream);
         }
 
-        public static int read_TYPE_SINT32(Stream stream)
+        public static int Read_TYPE_SINT32(Stream stream)
         {
-            return ZigZag.decode32((uint)readVarint(stream));
+            return ZigZag.Decode32((uint)ReadVarint(stream));
         }
 
-        public static long read_TYPE_SINT64(Stream stream)
+        public static long Read_TYPE_SINT64(Stream stream)
         {
-            return ZigZag.decode64(readVarint(stream));
+            return ZigZag.Decode64(ReadVarint(stream));
         }
 
-        public static bool read_TYPE_BOOL(Stream stream)
+        public static bool Read_TYPE_BOOL(Stream stream)
         {
             int b = stream.ReadByte();
             if (b < 0)
@@ -94,12 +94,12 @@ namespace bookrpg.net.protobuf
             throw new ProtobufException("Invalid boolean value");
         }
 
-        public static int read_TYPE_ENUM(Stream stream)
+        public static int Read_TYPE_ENUM(Stream stream)
         {
-            return (int)readVarint(stream);
+            return (int)ReadVarint(stream);
         }
 
-        private static ulong readVarint(Stream stream)
+        private static ulong ReadVarint(Stream stream)
         {
             int b;
             ulong val = 0;
@@ -129,34 +129,34 @@ namespace bookrpg.net.protobuf
 
         #region fixed number
 
-        public static uint read_TYPE_FIXED32(Stream stream)
+        public static uint Read_TYPE_FIXED32(Stream stream)
         {
-            return getReader(stream).ReadUInt32();
+            return GetReader(stream).ReadUInt32();
         }
 
-        public static ulong read_TYPE_FIXED64(Stream stream)
+        public static ulong Read_TYPE_FIXED64(Stream stream)
         {
-            return getReader(stream).ReadUInt64();
+            return GetReader(stream).ReadUInt64();
         }
 
-        public static int read_TYPE_SFIXED32(Stream stream)
+        public static int Read_TYPE_SFIXED32(Stream stream)
         {
-            return getReader(stream).ReadInt32();
+            return GetReader(stream).ReadInt32();
         }
 
-        public static long read_TYPE_SFIXED64(Stream stream)
+        public static long Read_TYPE_SFIXED64(Stream stream)
         {
-            return getReader(stream).ReadInt64();
+            return GetReader(stream).ReadInt64();
         }
 
-        public static float read_TYPE_FLOAT(Stream stream)
+        public static float Read_TYPE_FLOAT(Stream stream)
         {
-            return getReader(stream).ReadSingle();
+            return GetReader(stream).ReadSingle();
         }
 
-        public static double read_TYPE_DOUBLE(Stream stream)
+        public static double Read_TYPE_DOUBLE(Stream stream)
         {
-            return getReader(stream).ReadDouble();
+            return GetReader(stream).ReadDouble();
         }
 
         #endregion
@@ -164,10 +164,10 @@ namespace bookrpg.net.protobuf
 
         #region length delimited
 
-        public static byte[] read_TYPE_BYTES(Stream stream)
+        public static byte[] Read_TYPE_BYTES(Stream stream)
         {
             //VarInt length
-            int length = (int)readVarint(stream);
+            int length = (int)ReadVarint(stream);
 
             //Bytes
             byte[] buffer = new byte[length];
@@ -182,29 +182,29 @@ namespace bookrpg.net.protobuf
             return buffer;
         }
 
-        public static string read_TYPE_STRING(Stream stream)
+        public static string Read_TYPE_STRING(Stream stream)
         {
-            var bytes = read_TYPE_BYTES(stream);
+            var bytes = Read_TYPE_BYTES(stream);
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
 
-        public static IMessage read_TYPE_MESSAGE(Stream stream, IMessage message)
+        public static IMessage Read_TYPE_MESSAGE(Stream stream, IMessage message)
         {
-            var bytes = read_TYPE_BYTES(stream);
+            var bytes = Read_TYPE_BYTES(stream);
             using (var ms = new MemoryStream(bytes))
             {
-                message.parseFrom(ms);
+                message.ParseFrom(ms);
             }
             return message;
         }
 
-        public static List<T> readPackedRepeated<T>(
+        public static List<T> ReadPackedRepeated<T>(
             Stream stream, 
                 Func<Stream, T> writeFunction, 
                 List<T> value
                 )
         {
-            var bytes = read_TYPE_BYTES(stream);
+            var bytes = Read_TYPE_BYTES(stream);
             using (var ms = new MemoryStream(bytes))
             {
                 while (ms.Position < ms.Length) {

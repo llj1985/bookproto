@@ -93,21 +93,21 @@ function getFieldNotListType($field, $prefix='')
 function getFieldReader($field)
 {
     if ($field->isProtobufScalarType()) {
-        return 'read_TYPE_' . strtoupper($field->getType());
+        return 'Read_TYPE_' . strtoupper($field->getType());
     } else if ($field->getTypeDescriptor() instanceof EnumDescriptor) {
-        return 'read_TYPE_ENUM';
+        return 'Read_TYPE_ENUM';
     } else {
-        return 'read_TYPE_MESSAGE';
+        return 'Read_TYPE_MESSAGE';
     }
 }
 
 function getFieldWriter($field)
 {
     if ($field->isProtobufScalarType()) {
-        return 'write_TYPE_' . strtoupper($field->getType());
+        return 'Write_TYPE_' . strtoupper($field->getType());
     } else if ($field->getTypeDescriptor() instanceof EnumDescriptor) {
-        return 'write_TYPE_ENUM';
+        return 'Write_TYPE_ENUM';
     } else {
-        return 'write_TYPE_MESSAGE';
+        return 'Write_TYPE_MESSAGE';
     }
 }
