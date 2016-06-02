@@ -1,4 +1,4 @@
-	public partial class {%echo $prefix.$name%} : IMessage{%if($parentClass)echo ',',$parentClass;%} 
+	public partial class {%echo $prefix.$name%} : NetMessage{%if($parentClass)echo ',',$parentClass;%} 
     {
 		{%
 			foreach ($fields as $field):
@@ -31,8 +31,10 @@
 
 		{%endforeach;%}
 
-		public void ParseFrom(Stream stream)
+		public override void ParseFrom(ByteArray stream)
 		{
+			base.ParseFrom(stream);
+			
             {%
                 foreach ($fields as $field):
                 $fname = $field->getName();
@@ -44,7 +46,7 @@
                 endforeach;
             %}
 
-            while (stream.Position != stream.Length)
+            while (stream.bytesAvailable > 0)
             {
                 var tag = ReadUtils.ReadTag(stream);
                 switch (tag.number)
@@ -102,8 +104,10 @@
             %}
 		}
 
-		public void WriteTo(Stream stream)
+		public override void WriteTo(ByteArray stream)
 		{
+			base.WriteTo(stream);
+
             {%
 				foreach ($fields as $field):
 				$number = $field->getNumber();
