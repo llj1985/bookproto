@@ -1,4 +1,4 @@
-	public partial class {%echo $prefix.$name%} : NetMessage{%if($parentClass)echo ',',$parentClass;%} 
+	public partial class {%echo $prefix.$name%} : Message{%if($parentClass)echo ',',$parentClass;%} 
     {
 		{%
 			foreach ($fields as $field):

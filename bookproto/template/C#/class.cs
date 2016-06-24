@@ -8,7 +8,11 @@ using System.Collections.Generic;
 using bookrpg.net;
 using bookrpg.net.protobuf;
 
+{% if ($package != ''): %}
 namespace {%$package%} 
 {
+{% endif; %}
     {% include insertTpl('nestedClass'); %}
+{% if ($package != ''): %}
 }
+{% endif; %}
