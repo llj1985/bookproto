@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections.Generic;
 using bookrpg.net;
 using bookrpg.net.protobuf;
+using bookrpg.utils;
 
 {% if ($package != ''): %}
 namespace {%$package%} 
