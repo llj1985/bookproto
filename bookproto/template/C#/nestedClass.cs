@@ -31,9 +31,9 @@
 
 		{%endforeach;%}
 
-		public override void ParseFrom(ByteArray stream)
+		public override void Deserialize(ByteArray stream)
 		{
-			base.ParseFrom(stream);
+			base.Deserialize(stream);
 			
             {%
                 foreach ($fields as $field):
@@ -104,9 +104,9 @@
             %}
 		}
 
-		public override void WriteTo(ByteArray stream)
+		public override ByteArray Serialize(ByteArray stream=null, bool skipHead = false)
 		{
-			base.WriteTo(stream);
+			stream = base.Serialize(stream, skipHead);
 
             {%
 				foreach ($fields as $field):
@@ -158,6 +158,8 @@
 			{%endif;%}
 
 			{%endforeach;%}
+
+			return stream;
 		}
 
 		{%

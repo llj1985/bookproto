@@ -2,6 +2,8 @@
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using bookrpg.net;
+using bookrpg.utils;
 
 namespace bookrpg.net.protobuf
 {
@@ -11,17 +13,7 @@ namespace bookrpg.net.protobuf
         {
         }
 
-        private static BinaryReader reader;
-
-        private static BinaryReader GetReader(Stream stream)
-        {
-            if (reader == null || reader.BaseStream != stream) {
-                reader = new BinaryReader(stream);
-            }
-            return reader;
-        }
-
-        public static void Skip(Stream stream, WireType wireType)
+        public static void Skip(ByteArray stream, WireType wireType)
         {
             switch (wireType) {
                 case WireType.Varint:
@@ -43,7 +35,7 @@ namespace bookrpg.net.protobuf
 
         #region varint number
 
-        public static Tag ReadTag(Stream stream)
+        public static Tag ReadTag(ByteArray stream)
         {
             var tag = new Tag();
             var n = (uint)ReadVarint(stream);
@@ -52,37 +44,43 @@ namespace bookrpg.net.protobuf
             return tag;
         }
 
-        public static int Read_TYPE_INT32(Stream stream)
+        /// <summary>
+        /// caution：it's ineffective when write negative number, use Read_TYPE_SINT32 instead
+        /// </summary>
+        public static int Read_TYPE_INT32(ByteArray stream)
         {
             return (int)ReadVarint(stream);
         }
 
-        public static long Read_TYPE_INT64(Stream stream)
+        /// <summary>
+        /// caution：it's ineffective when write negative number, use Read_TYPE_SINT64 instead
+        /// </summary>
+        public static long Read_TYPE_INT64(ByteArray stream)
         {
             return (long)ReadVarint(stream);
         }
 
-        public static uint Read_TYPE_UINT32(Stream stream)
+        public static uint Read_TYPE_UINT32(ByteArray stream)
         {
             return (uint)ReadVarint(stream);
         }
 
-        public static ulong Read_TYPE_UINT64(Stream stream)
+        public static ulong Read_TYPE_UINT64(ByteArray stream)
         {
             return ReadVarint(stream);
         }
 
-        public static int Read_TYPE_SINT32(Stream stream)
+        public static int Read_TYPE_SINT32(ByteArray stream)
         {
             return ZigZag.Decode32((uint)ReadVarint(stream));
         }
 
-        public static long Read_TYPE_SINT64(Stream stream)
+        public static long Read_TYPE_SINT64(ByteArray stream)
         {
             return ZigZag.Decode64(ReadVarint(stream));
         }
 
-        public static bool Read_TYPE_BOOL(Stream stream)
+        public static bool Read_TYPE_BOOL(ByteArray stream)
         {
             int b = stream.ReadByte();
             if (b < 0)
@@ -94,12 +92,12 @@ namespace bookrpg.net.protobuf
             throw new ProtobufException("Invalid boolean value");
         }
 
-        public static int Read_TYPE_ENUM(Stream stream)
+        public static int Read_TYPE_ENUM(ByteArray stream)
         {
             return (int)ReadVarint(stream);
         }
 
-        private static ulong ReadVarint(Stream stream)
+        private static ulong ReadVarint(ByteArray stream)
         {
             int b;
             ulong val = 0;
@@ -129,34 +127,34 @@ namespace bookrpg.net.protobuf
 
         #region fixed number
 
-        public static uint Read_TYPE_FIXED32(Stream stream)
+        public static uint Read_TYPE_FIXED32(ByteArray stream)
         {
-            return GetReader(stream).ReadUInt32();
+            return stream.ReadUInt32();
         }
 
-        public static ulong Read_TYPE_FIXED64(Stream stream)
+        public static ulong Read_TYPE_FIXED64(ByteArray stream)
         {
-            return GetReader(stream).ReadUInt64();
+            return stream.ReadUInt64();
         }
 
-        public static int Read_TYPE_SFIXED32(Stream stream)
+        public static int Read_TYPE_SFIXED32(ByteArray stream)
         {
-            return GetReader(stream).ReadInt32();
+            return stream.ReadInt32();
         }
 
-        public static long Read_TYPE_SFIXED64(Stream stream)
+        public static long Read_TYPE_SFIXED64(ByteArray stream)
         {
-            return GetReader(stream).ReadInt64();
+            return stream.ReadInt64();
         }
 
-        public static float Read_TYPE_FLOAT(Stream stream)
+        public static float Read_TYPE_FLOAT(ByteArray stream)
         {
-            return GetReader(stream).ReadSingle();
+            return stream.ReadSingle();
         }
 
-        public static double Read_TYPE_DOUBLE(Stream stream)
+        public static double Read_TYPE_DOUBLE(ByteArray stream)
         {
-            return GetReader(stream).ReadDouble();
+            return stream.ReadDouble();
         }
 
         #endregion
@@ -164,7 +162,7 @@ namespace bookrpg.net.protobuf
 
         #region length delimited
 
-        public static byte[] Read_TYPE_BYTES(Stream stream)
+        public static byte[] Read_TYPE_BYTES(ByteArray stream)
         {
             //VarInt length
             int length = (int)ReadVarint(stream);
@@ -182,32 +180,32 @@ namespace bookrpg.net.protobuf
             return buffer;
         }
 
-        public static string Read_TYPE_STRING(Stream stream)
+        public static string Read_TYPE_STRING(ByteArray stream)
         {
             var bytes = Read_TYPE_BYTES(stream);
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
 
-        public static IMessage Read_TYPE_MESSAGE(Stream stream, IMessage message)
+        public static IMessage Read_TYPE_MESSAGE(ByteArray stream, IMessage message)
         {
             var bytes = Read_TYPE_BYTES(stream);
-            using (var ms = new MemoryStream(bytes))
+            using (var ms = new ByteArray(bytes))
             {
-                message.ParseFrom(ms);
+                message.Deserialize(ms);
             }
             return message;
         }
 
         public static List<T> ReadPackedRepeated<T>(
-            Stream stream, 
-                Func<Stream, T> writeFunction, 
+            ByteArray stream, 
+                Func<ByteArray, T> writeFunction, 
                 List<T> value
                 )
         {
             var bytes = Read_TYPE_BYTES(stream);
-            using (var ms = new MemoryStream(bytes))
+            using (var ms = new ByteArray(bytes))
             {
-                while (ms.Position < ms.Length) {
+                while (ms.bytesAvailable > 0) {
                     value.Add(writeFunction(ms));
                 }
             }

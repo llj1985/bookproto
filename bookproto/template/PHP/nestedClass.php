@@ -1,4 +1,4 @@
-	class {%echo $prefix.$name%} extends {%if($parentClass):echo ',',$parentClass;else:%}\ProtobufMessage{%endif;%} 
+	class {%echo $prefix.$name%} extends {%if($parentClass):echo ',',$parentClass;else:%}\bookrpg\route\impl\DefaultMessage{%endif;%} 
     {
     	/* @var array Field descriptors */
 	    protected static $fields = array(

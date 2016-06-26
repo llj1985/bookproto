@@ -1,12 +1,16 @@
-﻿using System;
+﻿using UnityEngine;
 using System.IO;
+using System.Collections;
+using bookrpg.utils;
 
-namespace bookrpg.net.protobuf
+namespace bookrpg.net
 {
-	public interface IMessage
-	{
-	    void ParseFrom(Stream input);
+    public interface IMessage
+    {
+        uint opcode { get; set; }
 
-	    void WriteTo(Stream output);
-	}
+        void Deserialize(ByteArray stream);
+
+        ByteArray Serialize(ByteArray stream = null, bool skipHead = false);
+    }
 }
